@@ -1,0 +1,9 @@
+	query
+params	Tn
+gridboxlabel	tirol
+lat_min	46.77
+lat_max	47.71
+lon_min	9.53
+lon_max	13.51
+output_format	netcdf
+file_extention	nc
