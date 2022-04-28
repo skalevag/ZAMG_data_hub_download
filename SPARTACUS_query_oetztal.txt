@@ -1,5 +1,5 @@
-	dict
-params	GL
+	query
+params	RR
 gridboxlabel	oetztal
 lat_min	46.6
 lat_max	47.3
@@ -7,4 +7,3 @@ lon_min	10.5
 lon_max	11.4
 output_format	netcdf
 file_extention	nc
-output_filename_head	incal-hourly
