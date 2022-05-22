@@ -6,6 +6,7 @@ Define a latitude-longitude box as well as start and end dates. ZAMG data hub on
 
 **TODOs:**
 
--[ ] Station data download
--[ ] Adding other gridded datasets, e.g. Winfore, APOLIS
+- Station data download
+- Adding other gridded datasets, e.g. Winfore, APOLIS
+- Update licence
 
