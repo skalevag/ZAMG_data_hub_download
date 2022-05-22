@@ -2,9 +2,9 @@ import requests
 import urllib
 from pathlib import Path
 import subprocess
-from ZAMGdatahub import utils
+from ZAMGdatahub import utils,query
 
-def makeURL(dataset,start,end,**query):
+def makeURL(ZAMGquery: query.ZAMGdatahubQuery, start, end):
     """
     Makes a URL string for requesting gridded dataset from ZAMG data hub (https://data.hub.zamg.ac.at).
     
@@ -12,47 +12,34 @@ def makeURL(dataset,start,end,**query):
     
     Parameters
     ----------
+    query : ZAMGdatahubQuery
     start : str
     end : str
-    params : str
-        default: "T2M"
-    lat_min : str ; float
-        default: 46.6
-    lat_max : str ; float
-        default: 47.3
-    lon_min : str ; float
-        default: 10.5
-    lon_max : str ; float
-        default: 11.4
-    output_format : str
-        default: "netcdf"
     
     Returns
     -------
     url : str
     """
-    # unpack
-    lat_min = query.get("lat_min",46.6)
-    lat_max = query.get("lat_max",47.3)
-    lon_min = query.get("lon_min",10.5)
-    lon_max = query.get("lon_max",11.4)
-    params = query.get("params","T2M")
-    output_format = query.get('output_format',"netcdf")
-    
+
     # make start- and endtime strings
     sd = start.replace(" ","T")
     ed = end.replace(" ","T")
 
-    # make gridbox string
-    bbox = f"{lat_min},{lon_min},{lat_max},{lon_max}"
-    
     # make query URL
-    dataset = dataset.upper()
-    if dataset == "INCA":
+    if ZAMGquery.dataset is query.DatasetType.INCA:
+        bbox = f"{ZAMGquery.lat_min},{ZAMGquery.lon_min},{ZAMGquery.lat_max},{ZAMGquery.lon_max}"
         baseurl = "https://dataset.api.hub.zamg.ac.at/v1/grid/historical/inca-v1-1h-1km"
-    elif dataset == "SPARTACUS":
+        url = baseurl + f"?anonymous=true&parameters={','.join(ZAMGquery.params)}&start={sd}&end={ed}&bbox={bbox}&output_format={ZAMGquery.output_format}"
+    elif ZAMGquery.dataset is query.DatasetType.SPARTACUS:
+        bbox = f"{ZAMGquery.lat_min},{ZAMGquery.lon_min},{ZAMGquery.lat_max},{ZAMGquery.lon_max}"
         baseurl = "https://dataset.api.hub.zamg.ac.at/v1/grid/historical/spartacus-v1-1d-1km"
-    url = baseurl + f"?anonymous=true&parameters={params}&start={sd}&end={ed}&bbox={bbox}&output_format={output_format}"
+        url = baseurl + f"?anonymous=true&parameters={','.join(ZAMGquery.params)}&start={sd}&end={ed}&bbox={bbox}&output_format={ZAMGquery.output_format}"
+    elif ZAMGquery.dataset is query.DatasetType.INCA_POINT:
+        baseurl = "https://dataset.api.hub.zamg.ac.at/v1/timeseries/historical/inca-v1-1h-1km"
+        url = baseurl + f"?anonymous=true&parameters={','.join(ZAMGquery.params)}&start={sd}&end={ed}&lon={ZAMGquery.lon}&lat={ZAMGquery.lat}&output_format={ZAMGquery.output_format}"
+    elif ZAMGquery.dataset is query.DatasetType.SPARTACUS_POINT:
+        baseurl = "https://dataset.api.hub.zamg.ac.at/v1/timeseries/historical/spartacus-v1-1d-1km"
+        url = baseurl + f"?anonymous=true&parameters={','.join(ZAMGquery.params)}&start={sd}&end={ed}&lon={ZAMGquery.lon}&lat={ZAMGquery.lat}&output_format={ZAMGquery.output_format}"
 
     return url
 
@@ -68,7 +55,7 @@ def downloadData(ZAMGquery,start,end,ODIR,overwrite=False,verbose=True):
     
     # check whether file already exists
     if overwrite or not outfile.is_file():
-        url = makeURL(ZAMGquery.dataset,start,end,**ZAMGquery.query)
+        url = makeURL(ZAMGquery,start,end)
         r = requests.get(url)
         if str(r) == "<Response [400]>":
             #print(url)

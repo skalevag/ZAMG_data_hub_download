@@ -51,15 +51,11 @@ def makeFilename(start,end,ZAMGquery):
     """
     Make filename from a ZAMG datahub query.
     """
-    output_filename_head = ZAMGquery.output_filename_head
-    params = ZAMGquery.params
-    gridboxlabel = ZAMGquery.name
-    file_extention = ZAMGquery.query["file_extention"]
-    
+    format_to_extention = {"netcdf":"nc","csv":"csv"}
     # compact the datetime notation
     s = start.replace("-","").replace(" ","").replace(":","")
     e = end.replace("-","").replace(" ","").replace(":","")
     timeslice = f"{s}-{e}"
     # make filename
-    filename = "_".join([output_filename_head,params,gridboxlabel,timeslice])+f".{file_extention}"
+    filename = "_".join([ZAMGquery.output_filename_head,','.join(ZAMGquery.params),ZAMGquery.location_label,timeslice])+f".{format_to_extention[ZAMGquery.output_format]}"
     return filename

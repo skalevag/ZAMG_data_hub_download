@@ -1,9 +1,10 @@
 	query
-params	RR
-gridboxlabel	oetztal
+params	Tn
+dataset	DatasetType.SPARTACUS
+location_label	oetztal
+output_filename_head	spartacus-daily
+output_format	netcdf
 lat_min	46.6
 lat_max	47.3
 lon_min	10.5
 lon_max	11.4
-output_format	netcdf
-file_extention	nc
