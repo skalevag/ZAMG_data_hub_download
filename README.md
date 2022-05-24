@@ -6,8 +6,10 @@ Define a latitude-longitude box as well as start and end dates. ZAMG data hub on
 
 **TODOs:**
 
-- Remove duplicate timesteps from merged INCAfiles, solution: https://code.mpimet.mpg.de/boards/1/topics/1134
 - Station data download
+    - make it more efficient by using the station metadata to define start and end dates, right now the download is super slow, because it downloads a lot of nans
+- Add custom error types for better error handling
 - Adding other gridded datasets, e.g. Winfore, APOLIS
 - Update licence
+
 

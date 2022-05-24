@@ -1,0 +1,94 @@
+,Kurzbeschreibung,Beschreibung,Einheit
+D2X,Windrichtung in Sektoren,Windrichtung in Sektoren: 32-teilig,
+D2X_qflag,Qualitätsqflag für D2X,"Qualitätsqflag für D2X - Qualitätsflag={0-2: ungeprüft, 3: automatisch geprüft}",
+D2X_typ,Qualitätstyp für D2X,"Qualitätstyp für D2X - Qualitätsflag={0-2: nicht geprüft, 3-5: automatisch geprüft, 6: manuell endgeprüft}",
+D6X,Windrichtung,Windrichtung in ° - vektorielles Mittel aus 10 Minuten-Werten über die Stunde ((hh-1):10 - hh:00),°
+D6X_qflag,Qualitätsqflag für D6X,"Qualitätsqflag für D6X - Qualitätsflag={0-2: ungeprüft, 3: automatisch geprüft}",
+D6X_typ,Qualitätstyp für D6X,"Qualitätstyp für D6X - Qualitätsflag={0-2: nicht geprüft, 3-5: automatisch geprüft, 6: manuell endgeprüft}",
+FFX,Relative Feuchte,"Relative Luftfeuchte - letzter 10 Minutenwert der vollen Stunde (01:00, 02:00,…)",%
+FFX_qflag,Qualitätsqflag für FFX,"Qualitätsqflag für FFX - Qualitätsflag={0-2: ungeprüft, 3: automatisch geprüft}",
+FFX_typ,Qualitätstyp für FFX,"Qualitätstyp für FFX - Qualitätsflag={0-2: nicht geprüft, 3-5: automatisch geprüft, 6: manuell endgeprüft}",
+GSR,Globalstrahlung ungeeicht,Globalstrahlung ungeeicht,mV
+GSR_qflag,Qualitätsqflag für GSR,"Qualitätsqflag für GSR - Qualitätsflag={0-2: ungeprüft, 3: automatisch geprüft}",
+GSR_typ,Qualitätstyp für GSR,"Qualitätstyp für GSR - Qualitätsflag={0-2: nicht geprüft, 3-5: automatisch geprüft, 6: manuell endgeprüft}",
+GSW,Globalstrahlung,"Globalstrahlung - Mittelwert aus 10 Minuten-Werten der kalibrierten Globalstrahlung, SUMME((hh-1):10 - hh:00)/6",W/m²
+GSW_qflag,Qualitätsqflag für GSW,"Qualitätsqflag für GSW - Qualitätsflag={0-2: ungeprüft, 3: automatisch geprüft}",
+GSW_typ,Qualitätstyp für GSW,"Qualitätstyp für GSW - Qualitätsflag={0-2: nicht geprüft, 3-5: automatisch geprüft, 6: manuell endgeprüft}",
+GSX,Globalstrahlung,Globalstrahlung - Mittelwert aus 10 Minuten-Werten der kalibrierten Globalstrahlung * 0.36 (=Umrechnung von W/m² auf J/cm²),J/cm²
+GSX_qflag,Qualitätsqflag für GSX,"Qualitätsqflag für GSX - Qualitätsflag={0-2: ungeprüft, 3: automatisch geprüft}",
+GSX_typ,Qualitätstyp für GSX,"Qualitätstyp für GSX - Qualitätsflag={0-2: nicht geprüft, 3-5: automatisch geprüft, 6: manuell endgeprüft}",
+HSR,Diffusstrahlung ungeeicht,"Diffusstrahlung ungeeicht - Mittelwert aus 10 Minuten-Werten der ungeeichten Diffusstrahlung, SUMME((hh-1):10 - hh:00)/6",mV
+HSR_qflag,Qualitätsqflag für HSR,"Qualitätsqflag für HSR - Qualitätsflag={0-2: ungeprüft, 3: automatisch geprüft}",
+HSR_typ,Qualitätstyp für HSR,"Qualitätstyp für HSR - Qualitätsflag={0-2: nicht geprüft, 3-5: automatisch geprüft, 6: manuell endgeprüft}",
+HSX,Diffusstrahlung,Diffusstrahlung - Mittelwert aus 10 Minuten-Werten der ungeeichten Diffusstrahlung HSR * Eichfaktor (monatsweise automatisch berechnet),J/cm² pro Stunde
+HSX_qflag,Qualitätsqflag für HSX,"Qualitätsqflag für HSX - Qualitätsflag={0-2: ungeprüft, 3: automatisch geprüft}",
+HSX_typ,Qualitätstyp für HSX,"Qualitätstyp für HSX - Qualitätsflag={0-2: nicht geprüft, 3-5: automatisch geprüft, 6: manuell endgeprüft}",
+LT2,Lufttemperatur in 5 cm,Lufttemperatur in 5 cm über dem Boden - minimaler 10 Minuten bzw. 1 Minuten-Wert der letzten Stunde,°C
+LT2_qflag,Qualitätsqflag für LT2,"Qualitätsqflag für LT2 - Qualitätsflag={0-2: ungeprüft, 3: automatisch geprüft}",
+LT2_typ,Qualitätstyp für LT2,"Qualitätstyp für LT2 - Qualitätsflag={0-2: nicht geprüft, 3-5: automatisch geprüft, 6: manuell endgeprüft}",
+PPX,Luftdruck Stationsniveau,"Luftdruck Stationsniveau - letzter 10 Minutenwert der vollen Stunde (01:00, 02:00,…)",mbar
+PPX_qflag,Qualitätsqflag für PPX,"Qualitätsqflag für PPX - Qualitätsflag={0-2: ungeprüft, 3: automatisch geprüft}",
+PPX_typ,Qualitätstyp für PPX,"Qualitätstyp für PPX - Qualitätsflag={0-2: nicht geprüft, 3-5: automatisch geprüft, 6: manuell endgeprüft}",
+PPY,Luftdruck auf Meeresniveau reduziert,Luftdruck auf Meeresniveau reduziert,mbar
+PPY_qflag,Qualitätsqflag für PPY,"Qualitätsqflag für PPY - Qualitätsflag={0-2: ungeprüft, 3: automatisch geprüft}",
+PPY_typ,Qualitätstyp für PPY,"Qualitätstyp für PPY - Qualitätsflag={0-2: nicht geprüft, 3-5: automatisch geprüft, 6: manuell endgeprüft}",
+RS2,Niederschlag 2,Niederschlag 2,mm
+RS2_qflag,Qualitätsqflag für RS2,"Qualitätsqflag für RS2 - Qualitätsflag={0-2: ungeprüft, 3: automatisch geprüft}",
+RS2_typ,Qualitätstyp für RS2,"Qualitätstyp für RS2 - Qualitätsflag={0-2: nicht geprüft, 3-5: automatisch geprüft, 6: manuell endgeprüft}",
+RSD,Niederschlagsdauer,Niederschlagsdauer - 60 Minuten-Summe ((hh-1):00:01 - hh:00:00) der 1 Minuten-Werte des Niederschlagmelders,min
+RSD_qflag,Qualitätsqflag für RSD,"Qualitätsqflag für RSD - Qualitätsflag={0-2: ungeprüft, 3: automatisch geprüft}",
+RSD_typ,Qualitätstyp für RSD,"Qualitätstyp für RSD - Qualitätsflag={0-2: nicht geprüft, 3-5: automatisch geprüft, 6: manuell endgeprüft}",
+RSX,Niederschlag,Niederschlag - 60 Minuten-Summe ((hh-1):00:01 - hh:00:00) der 1 Minuten-Werte des Niederschlags,mm
+RSX_qflag,Qualitätsqflag für RSX,"Qualitätsqflag für RSX - Qualitätsflag={0-2: ungeprüft, 3: automatisch geprüft}",
+RSX_typ,Qualitätstyp für RSX,"Qualitätstyp für RSX - Qualitätsflag={0-2: nicht geprüft, 3-5: automatisch geprüft, 6: manuell endgeprüft}",
+SCH,Schneehöhe,"Schneehöhe - aus Schneepegel,  letzter 10 Minutenwert der vollen Stunde (01:00, 02:00,…)",cm
+SCH_qflag,Qualitätsqflag für SCH,"Qualitätsqflag für SCH - Qualitätsflag={0-2: ungeprüft, 3: automatisch geprüft}",
+SCH_typ,Qualitätstyp für SCH,"Qualitätstyp für SCH - Qualitätsflag={0-2: nicht geprüft, 3-5: automatisch geprüft, 6: manuell endgeprüft}",
+SST,Direkte Sonnenstrahlung (direkt),Direkte Sonnenstrahlung (direkt),J/cm² pro Stunde
+SST_qflag,Qualitätsqflag für SST,"Qualitätsqflag für SST - Qualitätsflag={0-2: ungeprüft, 3: automatisch geprüft}",
+SST_typ,Qualitätstyp für SST,"Qualitätstyp für SST - Qualitätsflag={0-2: nicht geprüft, 3-5: automatisch geprüft, 6: manuell endgeprüft}",
+SUX,Sonnenscheindauer,Sonnenscheindauer - Summe((hh-1):10 -hh:00) in sec/3600 gerundet,h
+SUX_qflag,Qualitätsqflag für SUX,"Qualitätsqflag für SUX - Qualitätsflag={0-2: ungeprüft, 3: automatisch geprüft}",
+SUX_typ,Qualitätstyp für SUX,"Qualitätstyp für SUX - Qualitätsflag={0-2: nicht geprüft, 3-5: automatisch geprüft, 6: manuell endgeprüft}",
+TDX,Taupunktstemperatur,"Taupunktstemperatur -  letzter 10 Minutenwert der vollen Stunde (01:00, 02:00,…)",°C
+TDX_qflag,Qualitätsqflag für TDX,"Qualitätsqflag für TDX - Qualitätsflag={0-2: ungeprüft, 3: automatisch geprüft}",
+TDX_typ,Qualitätstyp für TDX,"Qualitätstyp für TDX - Qualitätsflag={0-2: nicht geprüft, 3-5: automatisch geprüft, 6: manuell endgeprüft}",
+TT0,Erdbodentemperatur in 200 cm Tiefe,"Erdbodentemperatur in 200 cm Tiefe -  letzter 10 Minutenwert der vollen Stunde (01:00, 02:00,…)",°C
+TT0_qflag,Qualitätsqflag für TT0,"Qualitätsqflag für TT0 - Qualitätsflag={0-2: ungeprüft, 3: automatisch geprüft}",
+TT0_typ,Qualitätstyp für TT0,"Qualitätstyp für TT0 - Qualitätsflag={0-2: nicht geprüft, 3-5: automatisch geprüft, 6: manuell endgeprüft}",
+TT2,Erdbodentemperatur in 10 cm Tiefe,"Erdbodentemperatur in 10 cm Tiefe -  letzter 10 Minutenwert der vollen Stunde (01:00, 02:00,…)",°C
+TT2_qflag,Qualitätsqflag für TT2,"Qualitätsqflag für TT2 - Qualitätsflag={0-2: ungeprüft, 3: automatisch geprüft}",
+TT2_typ,Qualitätstyp für TT2,"Qualitätstyp für TT2 - Qualitätsflag={0-2: nicht geprüft, 3-5: automatisch geprüft, 6: manuell endgeprüft}",
+TT3,Erdbodentemperatur in 20 cm Tiefe,"Erdbodentemperatur in 20 cm Tiefe -  letzter 10 Minutenwert der vollen Stunde (01:00, 02:00,…)",°C
+TT3_qflag,Qualitätsqflag für TT3,"Qualitätsqflag für TT3 - Qualitätsflag={0-2: ungeprüft, 3: automatisch geprüft}",
+TT3_typ,Qualitätstyp für TT3,"Qualitätstyp für TT3 - Qualitätsflag={0-2: nicht geprüft, 3-5: automatisch geprüft, 6: manuell endgeprüft}",
+TT4,Erdbodentemperatur in 50 cm Tiefe,"Erdbodentemperatur in 50 cm Tiefe -  letzter 10 Minutenwert der vollen Stunde (01:00, 02:00,…)",°C
+TT4_qflag,Qualitätsqflag für TT4,"Qualitätsqflag für TT4 - Qualitätsflag={0-2: ungeprüft, 3: automatisch geprüft}",
+TT4_typ,Qualitätstyp für TT4,"Qualitätstyp für TT4 - Qualitätsflag={0-2: nicht geprüft, 3-5: automatisch geprüft, 6: manuell endgeprüft}",
+TT5,Erdbodentemperatur in 100 cm Tiefe,"Erdbodentemperatur in 100 cm Tiefe -  letzter 10 Minutenwert der vollen Stunde (01:00, 02:00,…)",°C
+TT5_qflag,Qualitätsqflag für TT5,"Qualitätsqflag für TT5 - Qualitätsflag={0-2: ungeprüft, 3: automatisch geprüft}",
+TT5_typ,Qualitätstyp für TT5,"Qualitätstyp für TT5 - Qualitätsflag={0-2: nicht geprüft, 3-5: automatisch geprüft, 6: manuell endgeprüft}",
+TTX,Lufttemperatur 2 meter,"Lufttemperatur 2 meter -  letzter 10 Minutenwert der vollen Stunde (01:00, 02:00,…)",°C
+TTX_qflag,Qualitätsqflag für TTX,"Qualitätsqflag für TTX - Qualitätsflag={0-2: ungeprüft, 3: automatisch geprüft}",
+TTX_typ,Qualitätstyp für TTX,"Qualitätstyp für TTX - Qualitätsflag={0-2: nicht geprüft, 3-5: automatisch geprüft, 6: manuell endgeprüft}",
+VKM,Windgeschwindigkeit,Windgeschwindigkeit,km/h
+VKM_qflag,Qualitätsqflag für VKM,"Qualitätsqflag für VKM - Qualitätsflag={0-2: ungeprüft, 3: automatisch geprüft}",
+VKM_typ,Qualitätstyp für VKM,"Qualitätstyp für VKM - Qualitätsflag={0-2: nicht geprüft, 3-5: automatisch geprüft, 6: manuell endgeprüft}",
+VPX,Dampfdruck,Dampfdruck,mbar
+VPX_qflag,Qualitätsqflag für VPX,"Qualitätsqflag für VPX - Qualitätsflag={0-2: ungeprüft, 3: automatisch geprüft}",
+VPX_typ,Qualitätstyp für VPX,"Qualitätstyp für VPX - Qualitätsflag={0-2: nicht geprüft, 3-5: automatisch geprüft, 6: manuell endgeprüft}",
+VVX,Windgeschwindigkeit,Windgeschwindigkeit - verktorielles Mittel aus 10 Minuten-Werten von ff über die Stunde ((hh-1):10 - hh:00),m/s
+VVX_qflag,Qualitätsqflag für VVX,"Qualitätsqflag für VVX - Qualitätsflag={0-2: ungeprüft, 3: automatisch geprüft}",
+VVX_typ,Qualitätstyp für VVX,"Qualitätstyp für VVX - Qualitätsflag={0-2: nicht geprüft, 3-5: automatisch geprüft, 6: manuell endgeprüft}",
+WSD,Windrichtung der Windspitze,Windrichtung der Windspitze -  ddx zum Zeitpunkt des maximalen ffx der Stunde ((hh-1):10 - hh:00),°
+WSD_qflag,Qualitätsqflag für WSD,"Qualitätsqflag für WSD - Qualitätsflag={0-2: ungeprüft, 3: automatisch geprüft}",
+WSD_typ,Qualitätstyp für WSD,"Qualitätstyp für WSD - Qualitätsflag={0-2: nicht geprüft, 3-5: automatisch geprüft, 6: manuell endgeprüft}",
+WSK,Windspitzen,Windspitzen,km/h
+WSK_qflag,Qualitätsqflag für WSK,"Qualitätsqflag für WSK - Qualitätsflag={0-2: ungeprüft, 3: automatisch geprüft}",
+WSK_typ,Qualitätstyp für WSK,"Qualitätstyp für WSK - Qualitätsflag={0-2: nicht geprüft, 3-5: automatisch geprüft, 6: manuell endgeprüft}",
+WSX,Windspitzen,Windspitzen -  Maximum von ffx (in der Stunde (hh-1):10- hh:00),m/s
+WSX_qflag,Qualitätsqflag für WSX,"Qualitätsqflag für WSX - Qualitätsflag={0-2: ungeprüft, 3: automatisch geprüft}",
+WSX_typ,Qualitätstyp für WSX,"Qualitätstyp für WSX - Qualitätsflag={0-2: nicht geprüft, 3-5: automatisch geprüft, 6: manuell endgeprüft}",
+WSZ,Zeit der Windspitze,Zeit der Windspitze -  zum maximalen ffx gehöriges zeitx (hh:mm) im Format hhmm,
+WSZ_qflag,Qualitätsqflag für WSZ,"Qualitätsqflag für WSZ - Qualitätsflag={0-2: ungeprüft, 3: automatisch geprüft}",
+WSZ_typ,Qualitätstyp für WSZ,"Qualitätstyp für WSZ - Qualitätsflag={0-2: nicht geprüft, 3-5: automatisch geprüft, 6: manuell endgeprüft}",

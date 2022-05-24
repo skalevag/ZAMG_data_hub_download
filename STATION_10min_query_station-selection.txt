@@ -1,0 +1,7 @@
+	query
+params	TB1
+dataset	DatasetType.STATION_10min
+station_ids	11803,11804,14631,17301,17315,17320,14701,14622,14603,14513,14403
+output_format	csv
+location_label	station-selection
+output_filename_head	station-10min

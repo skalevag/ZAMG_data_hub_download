@@ -21,6 +21,10 @@ def makeTimeSlices(year,firstMonth = 1,lastMonth=12,maxMonths=2,datetimeformat =
     if firstDOY is None:
         firstDOY = datetime.datetime(2011,3,1,0,0) # INCA data is only available from March 2011 onwards
     lastDOY = datetime.datetime(year+1,1,1,0,0)
+    now = datetime.datetime.now() #+ relativedelta(days=-2)
+    if now < lastDOY:
+        lastDOY = datetime.datetime(now.year,now.month,now.day,now.hour,0) 
+        lastMonth = now.month
     # set start month
     month = firstMonth
     
@@ -47,15 +51,50 @@ def makeTimeSlices(year,firstMonth = 1,lastMonth=12,maxMonths=2,datetimeformat =
     return slices
 
 
-def makeFilename(start,end,ZAMGquery):
+def makeFilename(start, end, ZAMGquery):
     """
     Make filename from a ZAMG datahub query.
     """
-    format_to_extention = {"netcdf":"nc","csv":"csv"}
+    format_to_extention = {"netcdf": "nc", "csv": "csv"}
     # compact the datetime notation
-    s = start.replace("-","").replace(" ","").replace(":","")
-    e = end.replace("-","").replace(" ","").replace(":","")
+    s = start.replace("-", "").replace(" ", "").replace(":", "")
+    e = end.replace("-", "").replace(" ", "").replace(":", "")
     timeslice = f"{s}-{e}"
     # make filename
-    filename = "_".join([ZAMGquery.output_filename_head,','.join(ZAMGquery.params),ZAMGquery.location_label,timeslice])+f".{format_to_extention[ZAMGquery.output_format]}"
+    filename = (
+        "_".join(
+            [
+                ZAMGquery.output_filename_head,
+                ",".join(ZAMGquery.params),
+                ZAMGquery.location_label,
+                timeslice,
+            ]
+        )
+        + f".{format_to_extention[ZAMGquery.output_format]}"
+    )
     return filename
+
+def makeStationFilenames(start, end, ZAMGquery):
+    """
+    Make filename from a ZAMG datahub query for station data.
+    """
+    format_to_extention = {"netcdf": "nc", "csv": "csv"}
+    # compact the datetime notation
+    s = start.replace("-", "").replace(" ", "").replace(":", "")
+    e = end.replace("-", "").replace(" ", "").replace(":", "")
+    timeslice = f"{s}-{e}"
+    # make filename
+    filenames = []
+    for station in ZAMGquery.station_ids:
+        filenames.append(
+            "_".join(
+                [
+                    station,
+                    ZAMGquery.output_filename_head,
+                    ",".join(ZAMGquery.params),
+                    timeslice,
+                ]
+            )
+            + f".{format_to_extention[ZAMGquery.output_format]}"
+        )
+    return filenames

@@ -1,10 +1,10 @@
 	query
+params	T2M
+dataset	DatasetType.INCA
+location_label	oetztal
 output_filename_head	incal-hourly
 output_format	netcdf
 lat_min	46.6
 lat_max	47.3
 lon_min	10.5
 lon_max	11.4
-params	GL
-dataset	DatasetType.INCA
-location_label	oetztal

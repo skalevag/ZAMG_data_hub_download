@@ -1,0 +1,12 @@
+LICENSE
+README.md
+setup.py
+ZAMGdatahub/__init__.py
+ZAMGdatahub/data_download.py
+ZAMGdatahub/query.py
+ZAMGdatahub/utils.py
+ZAMGdatahub.egg-info/PKG-INFO
+ZAMGdatahub.egg-info/SOURCES.txt
+ZAMGdatahub.egg-info/dependency_links.txt
+ZAMGdatahub.egg-info/not-zip-safe
+ZAMGdatahub.egg-info/top_level.txt

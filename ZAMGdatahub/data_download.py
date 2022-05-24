@@ -4,7 +4,7 @@ from pathlib import Path
 import subprocess
 from ZAMGdatahub import utils,query
 
-def makeURL(ZAMGquery: query.ZAMGdatahubQuery, start, end):
+def makeURL(ZAMGquery, start, end):
     """
     Makes a URL string for requesting gridded dataset from ZAMG data hub (https://data.hub.zamg.ac.at).
     
@@ -12,7 +12,7 @@ def makeURL(ZAMGquery: query.ZAMGdatahubQuery, start, end):
     
     Parameters
     ----------
-    query : ZAMGdatahubQuery
+    query : rasterQuery or stationQuery
     start : str
     end : str
     
@@ -24,6 +24,9 @@ def makeURL(ZAMGquery: query.ZAMGdatahubQuery, start, end):
     # make start- and endtime strings
     sd = start.replace(" ","T")
     ed = end.replace(" ","T")
+    #if ZAMGquery.dataset is query.DatasetType.STATION_10min:
+    #    sd = sd.replace(":","%3A")
+    #    ed = ed.replace(":","%3A")
 
     # make query URL
     if ZAMGquery.dataset is query.DatasetType.INCA:
@@ -40,6 +43,10 @@ def makeURL(ZAMGquery: query.ZAMGdatahubQuery, start, end):
     elif ZAMGquery.dataset is query.DatasetType.SPARTACUS_POINT:
         baseurl = "https://dataset.api.hub.zamg.ac.at/v1/timeseries/historical/spartacus-v1-1d-1km"
         url = baseurl + f"?anonymous=true&parameters={','.join(ZAMGquery.params)}&start={sd}&end={ed}&lon={ZAMGquery.lon}&lat={ZAMGquery.lat}&output_format={ZAMGquery.output_format}"
+    elif ZAMGquery.dataset is query.DatasetType.STATION_10min:
+        baseurl = "https://dataset.api.hub.zamg.ac.at/v1/station/historical/klima-v1-10min"
+        paramurl = "&".join(["parameters=" + par for par in ZAMGquery.params])
+        url = [baseurl + "?"+ paramurl + f"&start={sd}&end={ed}&station_ids={station}&output_format={ZAMGquery.output_format}&filename=dummy" for station in ZAMGquery.station_ids]
 
     return url
 
@@ -50,22 +57,28 @@ def downloadData(ZAMGquery,start,end,ODIR,overwrite=False,verbose=True):
     ODIR = Path(ODIR)
     
     # make filename
-    filename = utils.makeFilename(start,end,ZAMGquery)
-    outfile = ODIR.joinpath(filename)
-    
-    # check whether file already exists
-    if overwrite or not outfile.is_file():
-        url = makeURL(ZAMGquery,start,end)
-        r = requests.get(url)
-        if str(r) == "<Response [400]>":
-            #print(url)
-            raise requests.HTTPError(f"{r}: Bad request! {url}")
-        ff,html = urllib.request.urlretrieve(url, outfile)
-        if verbose: print(filename, "was downloaded.")
+    if ZAMGquery.dataset is query.DatasetType.STATION_10min or ZAMGquery.dataset is query.DatasetType.STATION_1h:
+        filenames = utils.makeStationFilenames(start,end,ZAMGquery)
+        outfiles = [ODIR.joinpath(f) for f in filenames]
+        urls = makeURL(ZAMGquery,start,end)
     else:
-        if verbose: print(filename, "has already been downloaded:",outfile)
+        filenames = [utils.makeFilename(start,end,ZAMGquery)]
+        outfiles = [ODIR.joinpath(filename)]
+        urls = [makeURL(ZAMGquery,start,end)]
+    
+    for outfile,filename,url in zip(outfiles,filenames,urls):
+        # check whether file already exists
+        if overwrite or not outfile.is_file():
+            r = requests.get(url)
+            if str(r) == "<Response [400]>":
+                #print(url)
+                raise requests.HTTPError(f"{r}: Bad request! Click link for more info: {url}")
+            ff,html = urllib.request.urlretrieve(url, outfile)
+            if verbose: print(filename, "was downloaded.")
+        else:
+            if verbose: print(filename, "has already been downloaded:",outfile)
         
-    return outfile
+    return outfiles
 
 def mergeNetCDFfilesByYear(year,DIR,verbose=True,overwrite=False):
     """
@@ -93,9 +106,13 @@ def mergeNetCDFfilesByYear(year,DIR,verbose=True,overwrite=False):
         cmd = ["cdo","-O","mergetime"] + files + [str(DIR.joinpath(outfile))]
     # make string of argument list
     cmd = " ".join(cmd)
+    # add environment variable that prohibits duplicate timestep indeces
+    cmd = "export SKIP_SAME_TIME=1 ; " + cmd
     # run process
+    if verbose:
+        print(">>>",cmd)
     process = subprocess.run(cmd,shell=True,capture_output=True,universal_newlines=True)
     # print output
     if verbose:
-        print(">>>",cmd)
+        print(process.stdout)
         print(process.stderr)
