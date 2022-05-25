@@ -2,13 +2,12 @@ import requests
 import urllib
 from pathlib import Path
 import subprocess
+import multiprocessing as mp
 from ZAMGdatahub import utils,query
 
-def makeURL(ZAMGquery, start, end):
+def makeURL(ZAMGquery, start: str, end: str):
     """
     Makes a URL string for requesting gridded dataset from ZAMG data hub (https://data.hub.zamg.ac.at).
-    
-    Default parameters requests 2-meter air temperature in a lat-lon box of the Ötztal Alps.
     
     Parameters
     ----------
@@ -24,9 +23,6 @@ def makeURL(ZAMGquery, start, end):
     # make start- and endtime strings
     sd = start.replace(" ","T")
     ed = end.replace(" ","T")
-    #if ZAMGquery.dataset is query.DatasetType.STATION_10min:
-    #    sd = sd.replace(":","%3A")
-    #    ed = ed.replace(":","%3A")
 
     # make query URL
     if ZAMGquery.dataset is query.DatasetType.INCA:
@@ -44,15 +40,36 @@ def makeURL(ZAMGquery, start, end):
         baseurl = "https://dataset.api.hub.zamg.ac.at/v1/timeseries/historical/spartacus-v1-1d-1km"
         url = baseurl + f"?anonymous=true&parameters={','.join(ZAMGquery.params)}&start={sd}&end={ed}&lon={ZAMGquery.lon}&lat={ZAMGquery.lat}&output_format={ZAMGquery.output_format}"
     elif ZAMGquery.dataset is query.DatasetType.STATION_10min:
+        starts = [start.replace(" ","T") for start in ZAMGquery.station_starts]
         baseurl = "https://dataset.api.hub.zamg.ac.at/v1/station/historical/klima-v1-10min"
         paramurl = "&".join(["parameters=" + par for par in ZAMGquery.params])
-        url = [baseurl + "?"+ paramurl + f"&start={sd}&end={ed}&station_ids={station}&output_format={ZAMGquery.output_format}&filename=dummy" for station in ZAMGquery.station_ids]
+        url = []
+        for station,sd in zip(ZAMGquery.station_ids,ZAMGquery.station_starts):
+            url.append( baseurl + "?"+ paramurl + f"&start={sd}&end={ed}&station_ids={station}&output_format={ZAMGquery.output_format}&filename=dummy")
 
     return url
 
-def downloadData(ZAMGquery,start,end,ODIR,overwrite=False,verbose=True):
+
+def requestData(url,outfile,overwrite=False,verbose=True):
+    """Send request for data and save to file."""
+    # check whether file already exists
+    if overwrite or not outfile.is_file():
+        r = requests.get(url)
+        if str(r) == "<Response [400]>":
+            raise requests.HTTPError(f"{r}: Bad request! Click link for more info: {url}")
+        urllib.request.urlretrieve(url, outfile)
+        if verbose: print(outfile.name, "was downloaded.")
+    else:
+        if verbose: print(outfile.name, "has already been downloaded:",outfile)
+    
+    return str(outfile)
+
+
+def downloadData(ZAMGquery,start: str,end: str,ODIR,overwrite=False ,verbose=True, parallel=False):
     """
     Requests and downloads data from ZAMG data hub, and saves the file in a specifed directory.
+
+    For station data parallel processing is highly recommended.
     """
     ODIR = Path(ODIR)
     
@@ -63,20 +80,19 @@ def downloadData(ZAMGquery,start,end,ODIR,overwrite=False,verbose=True):
         urls = makeURL(ZAMGquery,start,end)
     else:
         filenames = [utils.makeFilename(start,end,ZAMGquery)]
-        outfiles = [ODIR.joinpath(filename)]
+        outfiles = [ODIR.joinpath(filenames[0])]
         urls = [makeURL(ZAMGquery,start,end)]
     
-    for outfile,filename,url in zip(outfiles,filenames,urls):
-        # check whether file already exists
-        if overwrite or not outfile.is_file():
-            r = requests.get(url)
-            if str(r) == "<Response [400]>":
-                #print(url)
-                raise requests.HTTPError(f"{r}: Bad request! Click link for more info: {url}")
-            ff,html = urllib.request.urlretrieve(url, outfile)
-            if verbose: print(filename, "was downloaded.")
-        else:
-            if verbose: print(filename, "has already been downloaded:",outfile)
+    if parallel:
+        # init multiprocessing pool
+        pool = mp.Pool(mp.cpu_count())
+        # apply parallel processing
+        outfiles = [pool.apply(requestData, args=(url,outfile,overwrite,verbose)) for outfile,url in zip(outfiles,urls)]
+        # close pool
+        pool.close()
+    else:
+        for outfile,url in zip(outfiles,urls):
+            requestData(url,outfile,overwrite=overwrite,verbose=verbose)
         
     return outfiles
 

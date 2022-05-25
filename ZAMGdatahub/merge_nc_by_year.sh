@@ -1,11 +1,11 @@
 
 #!/bin/bash
 
-#WDIR=~/Documents/NRC_P8_water_energy_and_sediment/data/air_temp/grids/INCA
-
 sy=$2
 ey=$3
 WDIR=$1
+
+export SKIP_SAME_TIME=1
 
 for y in `seq $sy $ey` ; do
 	echo $y

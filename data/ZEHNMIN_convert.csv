@@ -1,0 +1,16 @@
+variable,var_id
+wind direction,DD
+wind speed,FF
+global radiation,GS
+diffuse radiation,HS
+air pressure,P
+relative humidity,RF
+precipitation,RR
+snow depth,SH
+sunshine duration,SO
+soil temperature,TB
+air temperature 2m,TL
+dew point,TP
+air temperature 5cm,TS
+timestamp of maximum wind speed,ZEIT
+quality flag,QFLAG

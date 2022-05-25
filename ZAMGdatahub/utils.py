@@ -1,3 +1,7 @@
+"""
+Basic functions needed for various steps of download process.
+"""
+
 import datetime
 from dateutil.relativedelta import relativedelta
 
@@ -82,14 +86,15 @@ def makeStationFilenames(start, end, ZAMGquery):
     # compact the datetime notation
     s = start.replace("-", "").replace(" ", "").replace(":", "")
     e = end.replace("-", "").replace(" ", "").replace(":", "")
-    timeslice = f"{s}-{e}"
+    timeslice = f"{s[:8]}-{e[:8]}"
     # make filename
     filenames = []
-    for station in ZAMGquery.station_ids:
+    for station,name in ZAMGquery.station_ids,ZAMGquery.station_names:
         filenames.append(
             "_".join(
                 [
                     station,
+                    name,
                     ZAMGquery.output_filename_head,
                     ",".join(ZAMGquery.params),
                     timeslice,

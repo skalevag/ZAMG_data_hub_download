@@ -121,14 +121,20 @@ class stationQuery:
     Query for downloading station data from the ZAMG datahub.
     """
     
-    def __init__(self, dataset: DatasetType, params: list or str , station_ids: list, location_label = None, output="csv"):
+    def __init__(self, dataset: DatasetType, params: list or str , station_ids: list, station_names: list, station_starts: list, location_label = None, output="csv"):
         """Initialise the query for the defined dataset type."""
         # add common attributes
         if type(params) is str:
-            params = [params,]
+            # convert to list and add quality flag id
+            params = [params,"QFLAG"]
+        else:
+            # add quality flag id
+            params.append("QFLAG")
         self.params = params
         self.dataset = dataset
         self.station_ids = [str(station) for station in station_ids]
+        self.station_names = station_names
+        self.station_starts = station_starts
         self.output_format = output
         # optional attributes
         if location_label:
@@ -163,6 +169,8 @@ def saveQuery(query,filename,DIR="."):
     query["params"] = ",".join(query["params"])
     try:
         query["station_ids"] = ",".join(query["station_ids"])
+        query["station_names"] = ",".join(query["station_names"])
+        query["station_starts"] = ",".join(query["station_starts"])
     except KeyError:
         pass
     queryTable = pd.DataFrame.from_dict(query,orient="index",columns=["query"])
@@ -193,6 +201,8 @@ def loadQuery(file):
             dataset = dataset,
             params = params.split(","), 
             station_ids = queryDict["station_ids"].split(","),
+            station_names = queryDict["station_names"].split(","),
+            station_starts = queryDict["station_starts"].split(","),
             output = queryDict["output_format"]
         )
 
