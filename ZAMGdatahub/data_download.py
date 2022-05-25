@@ -51,11 +51,11 @@ def makeURL(ZAMGquery, start: str, end: str):
     return url
 
 
-def requestData(url,outfile,overwrite=False,verbose=True):
+def requestData(url,outfile,overwrite=False,verbose=True, max_retries = 3):
     """Send request for data and save to file."""
     # check whether file already exists
     if overwrite or not outfile.is_file():
-        print(url)
+        print("Starting download of",outfile.name)
         r = requests.get(url)
         if str(r) == "<Response [400]>":
             raise requests.HTTPError(f"{r}: Bad request! Click link for more info: {url}")
@@ -67,7 +67,7 @@ def requestData(url,outfile,overwrite=False,verbose=True):
             if verbose: print("Trying again...")
             retries = 1
             success = False
-            while not success and retries < 4:
+            while not success and retries < max_retries+1:
                 try:
                     urllib.request.urlretrieve(url, outfile)
                     if verbose: print(outfile.name, "was downloaded.")
@@ -78,6 +78,9 @@ def requestData(url,outfile,overwrite=False,verbose=True):
                     if verbose: print(f"Failed again, will trying again after {wait} seconds.")
                     time.sleep(wait)
                     retries += 1 
+                finally:
+                    if not success:
+                        print(f"Failed to download {outfile.name}\nTry requesting less data, e.g. fewer parameters or smaller time periods.")
     else:
         if verbose: print(outfile.name, "has already been downloaded:",outfile)
     
