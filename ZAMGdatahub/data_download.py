@@ -3,6 +3,7 @@ import urllib
 from pathlib import Path
 import subprocess
 import multiprocessing as mp
+import time
 from ZAMGdatahub import utils,query
 
 def makeURL(ZAMGquery, start: str, end: str):
@@ -54,11 +55,29 @@ def requestData(url,outfile,overwrite=False,verbose=True):
     """Send request for data and save to file."""
     # check whether file already exists
     if overwrite or not outfile.is_file():
+        print(url)
         r = requests.get(url)
         if str(r) == "<Response [400]>":
             raise requests.HTTPError(f"{r}: Bad request! Click link for more info: {url}")
-        urllib.request.urlretrieve(url, outfile)
-        if verbose: print(outfile.name, "was downloaded.")
+        try:
+            urllib.request.urlretrieve(url, outfile)
+            if verbose: print(outfile.name, "was downloaded.")
+        except urllib.error.HTTPError as e:
+            if verbose: print(e)
+            if verbose: print("Trying again...")
+            retries = 1
+            success = False
+            while not success and retries < 4:
+                try:
+                    urllib.request.urlretrieve(url, outfile)
+                    if verbose: print(outfile.name, "was downloaded.")
+                    success = True
+                except urllib.error.HTTPError as e:
+                    wait = retries * 5
+                    if verbose: print(e)
+                    if verbose: print(f"Failed again, will trying again after {wait} seconds.")
+                    time.sleep(wait)
+                    retries += 1 
     else:
         if verbose: print(outfile.name, "has already been downloaded:",outfile)
     

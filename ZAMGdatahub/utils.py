@@ -84,20 +84,19 @@ def makeStationFilenames(start, end, ZAMGquery):
     """
     format_to_extention = {"netcdf": "nc", "csv": "csv"}
     # compact the datetime notation
-    s = start.replace("-", "").replace(" ", "").replace(":", "")
     e = end.replace("-", "").replace(" ", "").replace(":", "")
-    timeslice = f"{s[:8]}-{e[:8]}"
     # make filename
     filenames = []
-    for station,name in ZAMGquery.station_ids,ZAMGquery.station_names:
+    for station,name,start in zip(ZAMGquery.station_ids,ZAMGquery.station_names,ZAMGquery.station_starts):
+        s = start.replace("-", "").replace(" ", "").replace(":", "")
         filenames.append(
             "_".join(
                 [
-                    station,
+                    station.replace("/","-"),
                     name,
                     ZAMGquery.output_filename_head,
                     ",".join(ZAMGquery.params),
-                    timeslice,
+                    f"{s[:8]}-{e[:8]}",
                 ]
             )
             + f".{format_to_extention[ZAMGquery.output_format]}"
