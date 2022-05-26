@@ -60,7 +60,25 @@ def makeURL(ZAMGquery, start: str, end: str):
 
             else:
                 url.append( baseurl + "?"+ paramurl + f"&start={sd}&end={ed}&station_ids={station}&output_format={ZAMGquery.output_format}&filename=dummy")
+    elif ZAMGquery.dataset is query.DatasetType.STATION_1h:
+        starts = [start.replace(" ","T") for start in ZAMGquery.station_starts]
+        baseurl = "https://dataset.api.hub.zamg.ac.at/v1/station/historical/klima-v1-1h"
+        paramurl = "&".join(["parameters=" + par for par in ZAMGquery.params])
+        url = []
+        for station,sd in zip(ZAMGquery.station_ids,ZAMGquery.station_starts):
+            if ZAMGquery.annualSlices:
+                sd = datetime.datetime.strptime(sd,"%Y-%m-%d").strftime("%Y-%m-%d %H:%M")
+                slices = utils.makeAnnualTimeSlices(sd,end)
+                for sd,ed in slices:
+                    # make start- and endtime strings
+                    sd = sd.replace(" ","T")
+                    ed = ed.replace(" ","T")
+                    url.append( baseurl + "?"+ paramurl + f"&start={sd}&end={ed}&station_ids={station}&output_format={ZAMGquery.output_format}&filename=dummy")
 
+            else:
+                url.append( baseurl + "?"+ paramurl + f"&start={sd}&end={ed}&station_ids={station}&output_format={ZAMGquery.output_format}&filename=dummy")
+    else:
+        raise TypeError()
     return url
 
 

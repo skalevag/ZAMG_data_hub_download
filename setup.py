@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='ZAMGdatahub',
-      version='0.1',
+      version='0.2',
       description='Package for downloading data from ZAMG datahub.',
       url='https://gitup.uni-potsdam.de/skalevag2/nrc_p8_water_energy_and_sediment.git',
       author='Amalie Skålevåg',

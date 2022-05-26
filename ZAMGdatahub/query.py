@@ -125,9 +125,9 @@ class StationQuery:
         """Initialise the query for the defined dataset type."""
         # add common attributes
         if type(params) is str:
-            # convert to list and add quality flag id
-            params = [params,"QFLAG"]
-        else:
+            # convert to list
+            params = [params]
+        if dataset is DatasetType.STATION_10min:
             # add quality flag id
             params.append("QFLAG")
         self.params = params
