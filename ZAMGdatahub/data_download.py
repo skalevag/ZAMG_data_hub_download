@@ -1,9 +1,12 @@
+from xmlrpc.client import boolean
 import requests
 import urllib
 from pathlib import Path
 import subprocess
 import multiprocessing as mp
+from itertools import repeat
 import time
+import datetime
 from ZAMGdatahub import utils,query
 
 def makeURL(ZAMGquery, start: str, end: str):
@@ -46,7 +49,17 @@ def makeURL(ZAMGquery, start: str, end: str):
         paramurl = "&".join(["parameters=" + par for par in ZAMGquery.params])
         url = []
         for station,sd in zip(ZAMGquery.station_ids,ZAMGquery.station_starts):
-            url.append( baseurl + "?"+ paramurl + f"&start={sd}&end={ed}&station_ids={station}&output_format={ZAMGquery.output_format}&filename=dummy")
+            if ZAMGquery.annualSlices:
+                sd = datetime.datetime.strptime(sd,"%Y-%m-%d").strftime("%Y-%m-%d %H:%M")
+                slices = utils.makeAnnualTimeSlices(sd,end)
+                for sd,ed in slices:
+                    # make start- and endtime strings
+                    sd = sd.replace(" ","T")
+                    ed = ed.replace(" ","T")
+                    url.append( baseurl + "?"+ paramurl + f"&start={sd}&end={ed}&station_ids={station}&output_format={ZAMGquery.output_format}&filename=dummy")
+
+            else:
+                url.append( baseurl + "?"+ paramurl + f"&start={sd}&end={ed}&station_ids={station}&output_format={ZAMGquery.output_format}&filename=dummy")
 
     return url
 
@@ -87,7 +100,7 @@ def requestData(url,outfile,overwrite=False,verbose=True, max_retries = 3):
     return str(outfile)
 
 
-def downloadData(ZAMGquery,start: str,end: str,ODIR,overwrite=False ,verbose=True, parallel=False):
+def downloadData(ZAMGquery, start: str, end: str, ODIR, overwrite=False , verbose=True, parallelProcess=False) -> list:
     """
     Requests and downloads data from ZAMG data hub, and saves the file in a specifed directory.
 
@@ -97,21 +110,28 @@ def downloadData(ZAMGquery,start: str,end: str,ODIR,overwrite=False ,verbose=Tru
     
     # make filename
     if ZAMGquery.dataset is query.DatasetType.STATION_10min or ZAMGquery.dataset is query.DatasetType.STATION_1h:
-        filenames = utils.makeStationFilenames(start,end,ZAMGquery)
-        outfiles = [ODIR.joinpath(f) for f in filenames]
-        urls = makeURL(ZAMGquery,start,end)
+        if ZAMGquery.annualSlices:
+            filenames = utils.makeStationFilenames(start,end,ZAMGquery)
+            outfiles = []
+            for subdir,f in filenames:
+                if not ODIR.joinpath(subdir).is_dir(): ODIR.joinpath(subdir).mkdir()
+                outfiles.append(ODIR.joinpath(subdir,f))
+            urls = makeURL(ZAMGquery,start,end)
+        else:
+            filenames = utils.makeStationFilenames(start,end,ZAMGquery)
+            outfiles = [ODIR.joinpath(f) for f in filenames]
+            urls = makeURL(ZAMGquery,start,end)
     else:
         filenames = [utils.makeFilename(start,end,ZAMGquery)]
         outfiles = [ODIR.joinpath(filenames[0])]
         urls = [makeURL(ZAMGquery,start,end)]
     
-    if parallel:
-        # init multiprocessing pool
-        pool = mp.Pool(mp.cpu_count())
+    if parallelProcess:
+        cores = min(5,mp.cpu_count()-1)
+        print("Parallelising with",cores,"cores.")
         # apply parallel processing
-        outfiles = [pool.apply(requestData, args=(url,outfile,overwrite,verbose)) for outfile,url in zip(outfiles,urls)]
-        # close pool
-        pool.close()
+        with mp.Pool(cores) as pool:
+            pool.starmap(requestData, zip(urls,outfiles,repeat(overwrite),repeat(verbose)))
     else:
         for outfile,url in zip(outfiles,urls):
             requestData(url,outfile,overwrite=overwrite,verbose=verbose)

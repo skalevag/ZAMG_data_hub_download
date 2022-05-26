@@ -49,7 +49,7 @@ class LatLonLocation():
         return output
 
     
-class rasterQuery:
+class RasterQuery:
     """
     Query for downloading raster data or gridcell timeseries from raster data from the ZAMG datahub.
     """
@@ -116,12 +116,12 @@ class rasterQuery:
             filename = f"{self.dataset.name}_query_{self.location_label}"
         saveQuery(self.__dict__.copy(),filename,DIR=DIR)
 
-class stationQuery:
+class StationQuery:
     """
     Query for downloading station data from the ZAMG datahub.
     """
     
-    def __init__(self, dataset: DatasetType, params: list or str , station_ids: list, station_names: list, station_starts: list, location_label = None, output="csv"):
+    def __init__(self, dataset: DatasetType, params: list or str , station_ids: list, station_names: list, station_starts: list, annualSlices = True, location_label = None, output="csv"):
         """Initialise the query for the defined dataset type."""
         # add common attributes
         if type(params) is str:
@@ -134,8 +134,10 @@ class stationQuery:
         self.dataset = dataset
         self.station_ids = [str(station) for station in station_ids]
         self.station_names = station_names
+        self.station_longnames = [f"{str(ids)}_{str(station.replace('/','-').replace(' ','-'))}" for station,ids in zip(station_names,station_ids)]
         self.station_starts = station_starts
         self.output_format = output
+        self.annualSlices = annualSlices
         # optional attributes
         if location_label:
             self.location_label = location_label
@@ -183,21 +185,21 @@ def loadQuery(file):
     dataset = DatasetType[queryDict["dataset"].split(".")[-1]]
     params = queryDict["params"]
     if "lat_min" in queryDict.keys():
-        loadedQuery = rasterQuery(
+        loadedQuery = RasterQuery(
             dataset = dataset,
             params = params.split(","), 
             gridbox = LatLonBox(queryDict["location_label"],queryDict["lat_min"],queryDict["lat_max"],queryDict["lon_min"],queryDict["lon_max"]),
             output = queryDict["output_format"]
         )
     elif "lat" in queryDict.keys():
-        loadedQuery = rasterQuery(
+        loadedQuery = RasterQuery(
             dataset = dataset,
             params = params.split(","), 
             point_location = LatLonLocation(queryDict["location_label"],queryDict["lat"],queryDict["lon"]),
             output = queryDict["output_format"]
         )
     elif "station_ids" in queryDict.keys():
-        loadedQuery = stationQuery(
+        loadedQuery = StationQuery(
             dataset = dataset,
             params = params.split(","), 
             station_ids = queryDict["station_ids"].split(","),

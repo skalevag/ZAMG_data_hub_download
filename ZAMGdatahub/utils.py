@@ -1,25 +1,22 @@
-"""
-Basic functions needed for various steps of download process.
-"""
+"""Basic functions needed for various steps of download process."""
 
 import datetime
 from dateutil.relativedelta import relativedelta
 
-def makeTimeSlices(year,firstMonth = 1,lastMonth=12,maxMonths=2,datetimeformat = "%Y-%m-%d %H:%M",firstDOY=None):
-    """
-    Makes a list of time slices (start and end times) for a specified year.
-    
-    Parameters
-    ----------
-    year : int
-    firstMonth : int
-        default: 1
-    lastMonth : int
-        default: 12
-    maxMonth : int
-        default: 2
-    datetimeformat : str
-        default: '%Y-%m-%d %H:%M'
+
+def makeTimeSlices(year: int,firstMonth = 1,lastMonth=12,maxMonths=2,datetimeformat = "%Y-%m-%d %H:%M",firstDOY: datetime.datetime = None):
+    """Makes a list of time slices (start and end times) for a specified year. Inteded to be used when downloading INCA or SPARTACUS data.
+
+    Args:
+        year (int): which year to create time slices for
+        firstMonth (int, optional): the month to start the time slices. Defaults to 1.
+        lastMonth (int, optional): the month to end the time slices. Defaults to 12.
+        maxMonths (int, optional): maximum permitted number of months in each slice. Defaults to 2.
+        datetimeformat (str, optional): Format of output datetime sting. Defaults to "%Y-%m-%d %H:%M".
+        firstDOY (datetime.datetime, optional): The first date that is permitted in the first timeslice. Defaults to None.
+
+    Returns:
+        list: list of datetime stings as slices (tuples)
     """
     # set the last day of the year
     if firstDOY is None:
@@ -55,9 +52,38 @@ def makeTimeSlices(year,firstMonth = 1,lastMonth=12,maxMonths=2,datetimeformat =
     return slices
 
 
-def makeFilename(start, end, ZAMGquery):
+def makeAnnualTimeSlices(start: str,end: str, datetimeformat: str = "%Y-%m-%d %H:%M"):
+    """_summary_
+
+    Args:
+        start (str): start date or datetime as string
+        end (str): end date or datetime as string
+        datetimeformat (str, optional): format of input and output. Defaults to "%Y-%m-%d %H:%M".
+
+    Returns:
+        list: list of datetime slices as tuples
     """
-    Make filename from a ZAMG datahub query.
+    start = datetime.datetime.strptime(start,datetimeformat)
+    end = datetime.datetime.strptime(end,datetimeformat)
+
+    slices = []
+    for year in list(range(start.year,end.year+1)):
+        s = max(start,datetime.datetime(year,1,1,0,0))
+        e = min(end,datetime.datetime(year,12,31,23,59))
+        slices.append((s.strftime(datetimeformat),e.strftime(datetimeformat)))
+    return slices
+
+
+def makeFilename(start: str, end: str, ZAMGquery):
+    """Makes a filename based on a specified start and end date plus ZAMGquery.
+
+    Args:
+        start (str): start date or datetime as string
+        end (str): end date or datetime as string
+        ZAMGquery (ZAMGdatahub.query.stationQuery or ZAMGdatahub.query.stationQuery): the query submitted to ZAMG datahub to request data
+
+    Returns:
+        str: filename based on ZAMGquery
     """
     format_to_extention = {"netcdf": "nc", "csv": "csv"}
     # compact the datetime notation
@@ -78,27 +104,54 @@ def makeFilename(start, end, ZAMGquery):
     )
     return filename
 
-def makeStationFilenames(start, end, ZAMGquery):
-    """
-    Make filename from a ZAMG datahub query for station data.
+def makeStationFilenames(start: str, end: str, ZAMGquery):
+    """Make filename from a ZAMG datahub query for station data.
+
+    Args:
+        start (str): start date or datetime as string
+        end (str): end date or datetime as string
+        ZAMGquery (ZAMGdatahub.query.stationQuery or ZAMGdatahub.query.stationQuery): the query submitted to ZAMG datahub to request data
+
+    Returns:
+        list: list of filenames
     """
     format_to_extention = {"netcdf": "nc", "csv": "csv"}
-    # compact the datetime notation
-    e = end.replace("-", "").replace(" ", "").replace(":", "")
-    # make filename
+    
+    
     filenames = []
-    for station,name,start in zip(ZAMGquery.station_ids,ZAMGquery.station_names,ZAMGquery.station_starts):
-        s = start.replace("-", "").replace(" ", "").replace(":", "")
-        filenames.append(
-            "_".join(
-                [
-                    station.replace("/","-"),
-                    name,
-                    ZAMGquery.output_filename_head,
-                    ",".join(ZAMGquery.params),
-                    f"{s[:8]}-{e[:8]}",
-                ]
+    for station,name,start,subdir in zip(ZAMGquery.station_ids,ZAMGquery.station_names,ZAMGquery.station_starts,ZAMGquery.station_longnames):
+        if ZAMGquery.annualSlices:
+            start = datetime.datetime.strptime(start,"%Y-%m-%d").strftime("%Y-%m-%d %H:%M")
+            slices = makeAnnualTimeSlices(start,end)
+            for s,e in slices:
+                # make filename
+                filenames.append(
+                    (
+                        subdir,
+                        "_".join(
+                            [
+                                station,
+                                name.replace("/","-").replace(" ","-"),
+                                ZAMGquery.output_filename_head,
+                                f"{s[:4]}",
+                            ]
+                        ) + f".{format_to_extention[ZAMGquery.output_format]}"
+                    )
+                )
+        else:
+            # compact the datetime notation
+            e = end.replace("-", "").replace(" ", "").replace(":", "")
+            s = start.replace("-", "").replace(" ", "").replace(":", "")
+            # make filename
+            filenames.append(
+                "_".join(
+                    [
+                        station,
+                        name.replace("/","-").replace(" ","-"),
+                        ZAMGquery.output_filename_head,
+                        f"{s[:8]}-{e[:8]}",
+                    ]
+                )
+                + f".{format_to_extention[ZAMGquery.output_format]}"
             )
-            + f".{format_to_extention[ZAMGquery.output_format]}"
-        )
     return filenames
