@@ -1,4 +1,4 @@
-from xmlrpc.client import boolean
+import pathlib
 import requests
 import urllib
 from pathlib import Path
@@ -29,20 +29,11 @@ def makeURL(ZAMGquery, start: str, end: str):
     ed = end.replace(" ","T")
 
     # make query URL
-    if ZAMGquery.dataset is query.DatasetType.INCA:
+    if ZAMGquery.dataset is query.DatasetType.INCA or query.DatasetType.INCA_15min or query.DatasetType.SPARTACUS or query.DatasetType.SNOWGRID:
         bbox = f"{ZAMGquery.lat_min},{ZAMGquery.lon_min},{ZAMGquery.lat_max},{ZAMGquery.lon_max}"
-        baseurl = "https://dataset.api.hub.zamg.ac.at/v1/grid/historical/inca-v1-1h-1km"
-        url = baseurl + f"?anonymous=true&parameters={','.join(ZAMGquery.params)}&start={sd}&end={ed}&bbox={bbox}&output_format={ZAMGquery.output_format}"
-    elif ZAMGquery.dataset is query.DatasetType.SPARTACUS:
-        bbox = f"{ZAMGquery.lat_min},{ZAMGquery.lon_min},{ZAMGquery.lat_max},{ZAMGquery.lon_max}"
-        baseurl = "https://dataset.api.hub.zamg.ac.at/v1/grid/historical/spartacus-v1-1d-1km"
-        url = baseurl + f"?anonymous=true&parameters={','.join(ZAMGquery.params)}&start={sd}&end={ed}&bbox={bbox}&output_format={ZAMGquery.output_format}"
-    elif ZAMGquery.dataset is query.DatasetType.INCA_POINT:
-        baseurl = "https://dataset.api.hub.zamg.ac.at/v1/timeseries/historical/inca-v1-1h-1km"
-        url = baseurl + f"?anonymous=true&parameters={','.join(ZAMGquery.params)}&start={sd}&end={ed}&lon={ZAMGquery.lon}&lat={ZAMGquery.lat}&output_format={ZAMGquery.output_format}"
-    elif ZAMGquery.dataset is query.DatasetType.SPARTACUS_POINT:
-        baseurl = "https://dataset.api.hub.zamg.ac.at/v1/timeseries/historical/spartacus-v1-1d-1km"
-        url = baseurl + f"?anonymous=true&parameters={','.join(ZAMGquery.params)}&start={sd}&end={ed}&lon={ZAMGquery.lon}&lat={ZAMGquery.lat}&output_format={ZAMGquery.output_format}"
+        url = ZAMGquery.dataset.value + f"?anonymous=true&parameters={','.join(ZAMGquery.params)}&start={sd}&end={ed}&bbox={bbox}&output_format={ZAMGquery.output_format}"
+    elif ZAMGquery.dataset is query.DatasetType.INCA_POINT or query.DatasetType.SPARTACUS_POINT:
+        url = ZAMGquery.dataset.value + f"?anonymous=true&parameters={','.join(ZAMGquery.params)}&start={sd}&end={ed}&lon={ZAMGquery.lon}&lat={ZAMGquery.lat}&output_format={ZAMGquery.output_format}"
     elif ZAMGquery.dataset is query.DatasetType.STATION_10min:
         starts = [start.replace(" ","T") for start in ZAMGquery.station_starts]
         baseurl = "https://dataset.api.hub.zamg.ac.at/v1/station/historical/klima-v1-10min"
@@ -118,11 +109,21 @@ def requestData(url,outfile,overwrite=False,verbose=True, max_retries = 3):
     return str(outfile)
 
 
-def downloadData(ZAMGquery, start: str, end: str, ODIR, overwrite=False , verbose=True, parallelProcess=False) -> list:
-    """
-    Requests and downloads data from ZAMG data hub, and saves the file in a specifed directory.
-
+def downloadData(ZAMGquery, start: str, end: str, ODIR: str, overwrite=False , verbose=True, parallelProcess=False) -> list:
+    """Requests and downloads data from ZAMG data hub, and saves the file in a specifed directory.
     For station data parallel processing is highly recommended.
+    
+    Args:
+        ZAMGquery (_type_): _description_
+        start (str): _description_
+        end (str): _description_
+        ODIR (str): output directory
+        overwrite (bool, optional): whether to overwrite existing data
+        verbose (bool, optional): printed statements will be turned off if set to False
+        parallelProcess (bool, optional): option to download data in a parallel process, highly recommended for station data timeseries. Defaults to False.
+
+    Returns:
+        list: output files with downloaded data
     """
     ODIR = Path(ODIR)
     

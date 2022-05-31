@@ -1,11 +1,11 @@
 # ZAMG data hub download
 
-Rountines for downloading selected datasets from [ZAMG data hub](https://data.hub.zamg.ac.at/).
+Rountines for downloading selected datasets from [ZAMG data hub](https://data.hub.zamg.ac.at/) using the [API](https://dataset.api.hub.zamg.ac.at/v1/docs/).
 
 **TODOs:**
 
 - Add custom error types for better error handling
-- Adding other gridded datasets, e.g. Winfore, APOLIS
+- Improve handling of different dataset types
 - Update licence and make freely available
 
 

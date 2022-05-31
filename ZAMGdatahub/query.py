@@ -3,16 +3,25 @@ Module containing classes, methods and functions related to queries to the ZAMG 
 """
 
 import pandas as pd
-from enum import Enum, auto
-
+from enum import Enum
+from ZAMGdatahub import utils
 
 class DatasetType(Enum):
-    INCA = auto()
-    SPARTACUS = auto()
-    INCA_POINT = auto()
-    SPARTACUS_POINT = auto()
-    STATION_10min = auto()
-    STATION_1h = auto()
+    INCA = "https://dataset.api.hub.zamg.ac.at/v1/grid/historical/inca-v1-1h-1km"
+    INCA_15min = "https://dataset.api.hub.zamg.ac.at/v1/grid/historical/inca-v1-15min-1km"
+    INCA_POINT = "https://dataset.api.hub.zamg.ac.at/v1/timeseries/historical/inca-v1-1h-1km"
+    SPARTACUS = "https://dataset.api.hub.zamg.ac.at/v1/grid/historical/spartacus-v1-1d-1km"
+    SPARTACUS_v2 = "https://dataset.api.hub.zamg.ac.at/v1/grid/historical/spartacus-v2-1d-1km"
+    SPARTACUS_POINT = "https://dataset.api.hub.zamg.ac.at/v1/timeseries/historical/spartacus-v1-1d-1km"
+    SNOWGRID = "https://dataset.api.hub.zamg.ac.at/v1/grid/historical/snowgrid_cl-v1-1d-1km"
+    WINFORE = "https://dataset.api.hub.zamg.ac.at/v1/grid/historical/winfore-v1-1d-1km"
+    APOLIS = "https://dataset.api.hub.zamg.ac.at/v1/grid/historical/apolis_short-v1-1d-100m"
+    STATION_10min = "https://dataset.api.hub.zamg.ac.at/v1/station/historical/klima-v1-10min"
+    STATION_1h = "https://dataset.api.hub.zamg.ac.at/v1/station/historical/klima-v1-1h"
+
+    def getMetadata(self):
+        metadata = utils.getJSONfromURL(self.value+"/metadata")
+        return metadata
     
     
 class LatLonBox():
@@ -74,8 +83,36 @@ class RasterQuery:
             self.lat_max = gridbox.lat_max
             self.lon_min = gridbox.lon_min
             self.lon_max = gridbox.lon_max
+        elif dataset is DatasetType.INCA_15min:
+            self.output_filename_head = "incal-15min"
+            self.output_format = "netcdf"
+            self.lat_min = gridbox.lat_min
+            self.lat_max = gridbox.lat_max
+            self.lon_min = gridbox.lon_min
+            self.lon_max = gridbox.lon_max
         elif dataset is DatasetType.SPARTACUS:
             self.output_filename_head = "spartacus-daily"
+            self.output_format = "netcdf"
+            self.lat_min = gridbox.lat_min
+            self.lat_max = gridbox.lat_max
+            self.lon_min = gridbox.lon_min
+            self.lon_max = gridbox.lon_max
+        elif dataset is DatasetType.SPARTACUS_v2:
+            self.output_filename_head = "spartacus-daily-v2"
+            self.output_format = "netcdf"
+            self.lat_min = gridbox.lat_min
+            self.lat_max = gridbox.lat_max
+            self.lon_min = gridbox.lon_min
+            self.lon_max = gridbox.lon_max
+        elif dataset is DatasetType.APOLIS:
+            self.output_filename_head = dataset.value.split("/")[-1]
+            self.output_format = "netcdf"
+            self.lat_min = gridbox.lat_min
+            self.lat_max = gridbox.lat_max
+            self.lon_min = gridbox.lon_min
+            self.lon_max = gridbox.lon_max
+        elif dataset is DatasetType.SNOWGRID:
+            self.output_filename_head = "snowgrid"
             self.output_format = "netcdf"
             self.lat_min = gridbox.lat_min
             self.lat_max = gridbox.lat_max
@@ -91,15 +128,8 @@ class RasterQuery:
             self.output_format = "csv"
             self.lat = point_location.lat
             self.lon = point_location.lon
-        elif dataset is DatasetType.STATION_10min:
-            self.output_filename_head = "station-10min"
-            self.output_format = "csv"
-            self.lat = point_location.lat
-            self.lon = point_location.lon
         else:
-            print("Specified dataset was not SPARTACUS or INCA. Setting a generic output_filename_head. You can change this manually by editing the attribute.")
-            self.output_filename_head = "data"
-            self.output_format = output
+            raise TypeError("Specified dataset was not any of the INCA, SPARTACUS or SNOWGRID datasets.")
         
     def __repr__(self):
         return "ZAMGdatahubQuery()"
@@ -161,6 +191,12 @@ class StationQuery:
         
         
     def saveQuery(self,filename=None,DIR=None):
+        """_summary_
+
+        Args:
+            filename (_type_, optional): _description_. Defaults to None.
+            DIR (_type_, optional): _description_. Defaults to None.
+        """
         if DIR is None:
             DIR="."
         if filename is None:

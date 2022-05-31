@@ -1,0 +1,10 @@
+	query
+params	DIR_hori_daysum_kWh,GLO_hori_daysum_kWh
+dataset	DatasetType.APOLIS
+location_label	oetztal
+output_filename_head	apolis_short-v1-1d-100m
+output_format	netcdf
+lat_min	46.6
+lat_max	47.3
+lon_min	10.5
+lon_max	11.4

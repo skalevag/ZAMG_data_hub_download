@@ -1,0 +1,10 @@
+	query
+params	PT
+dataset	DatasetType.INCA_15min
+location_label	oetztal
+output_filename_head	incal-15min
+output_format	netcdf
+lat_min	46.6
+lat_max	47.3
+lon_min	10.5
+lon_max	11.4

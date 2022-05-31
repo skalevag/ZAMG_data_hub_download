@@ -2,9 +2,11 @@
 
 import datetime
 from dateutil.relativedelta import relativedelta
+import urllib.request
+import json
 
 
-def makeTimeSlices(year: int,firstMonth = 1,lastMonth=12,maxMonths=2,datetimeformat = "%Y-%m-%d %H:%M",firstDOY: datetime.datetime = None):
+def makeTimeSlices(year: int,firstMonth = 1,lastMonth=12,maxMonths=2,maxDays: int =None,datetimeformat = "%Y-%m-%d %H:%M",firstDOY: datetime.datetime = None) -> list:
     """Makes a list of time slices (start and end times) for a specified year. Inteded to be used when downloading INCA or SPARTACUS data.
 
     Args:
@@ -36,21 +38,66 @@ def makeTimeSlices(year: int,firstMonth = 1,lastMonth=12,maxMonths=2,datetimefor
         # check the first
         if dtStart<firstDOY:
             dtStart = firstDOY
-        dtEnd = dtStart + relativedelta(months=+maxMonths)
-        # check that the end datetime does not exceed the last day of the year
-        if dtEnd >= lastDOY:
-            dtEnd = lastDOY
-        
-        # convert to string
-        start = dtStart.strftime(datetimeformat)
-        end = dtEnd.strftime(datetimeformat)
+        if maxDays is None:
+            dtEnd = dtStart + relativedelta(months=+maxMonths)
+            # check that the end datetime does not exceed the last day of the year
+            if dtEnd >= lastDOY:
+                dtEnd = lastDOY
+            # convert to string
+            start = dtStart.strftime(datetimeformat)
+            end = dtEnd.strftime(datetimeformat)
 
-        slices.append((start,end))
+            slices.append((start,end))
+        else:
+            # if a maximum number of days are specified, override the max number of months
+            maxMonths = 1
+            # this will only slice the month in two slices
+            # the first one will be equal to maxDays, and the rest simply the rest of the month
+            dtEndMonth = dtStart + relativedelta(months=+maxMonths)
+            dtEnd = dtStart + relativedelta(days=+maxDays)
+            # check that the end datetime does not exceed the last day of the year
+            if dtEndMonth >= lastDOY:
+                dtEndMonth = lastDOY
+            elif dtEnd >= lastDOY:
+                dtEnd = lastDOY
+            
+            # convert to string
+            start = dtStart.strftime(datetimeformat)
+            middle = dtEnd.strftime(datetimeformat)
+            end = dtEndMonth.strftime(datetimeformat)
+
+            slices.append((start,middle))
+            slices.append((middle,end))
+        
+        
 
         month = month + maxMonths
     
     return slices
 
+
+def makeDailyTimeSlices(start: str,end: str, maxDays=1,datetimeformat: str = "%Y-%m-%d %H:%M") -> list:
+    """Make time slices that are a speficied length.
+
+    Args:
+        start (str): start of the first slice
+        end (str): end of the last slice
+        maxDays (int, optional): maximum number of days in each slice. Defaults to 1.
+        datetimeformat (_type_, optional): Format of output datetime sting. Defaults to "%Y-%m-%d %H:%M".
+
+    Returns:
+        list: list of datetime slices as tuples
+    """
+    start = datetime.datetime.strptime(start,datetimeformat)
+    end = datetime.datetime.strptime(end,datetimeformat)
+
+    slices = []
+    s = start
+    while s < end:
+        e = s + relativedelta(days=+maxDays)
+        slices.append((s.strftime(datetimeformat),e.strftime(datetimeformat)))
+        s = e
+    return slices
 
 def makeAnnualTimeSlices(start: str,end: str, datetimeformat: str = "%Y-%m-%d %H:%M"):
     """_summary_
@@ -72,7 +119,6 @@ def makeAnnualTimeSlices(start: str,end: str, datetimeformat: str = "%Y-%m-%d %H
         e = min(end,datetime.datetime(year,12,31,23,59))
         slices.append((s.strftime(datetimeformat),e.strftime(datetimeformat)))
     return slices
-
 
 def makeFilename(start: str, end: str, ZAMGquery):
     """Makes a filename based on a specified start and end date plus ZAMGquery.
@@ -155,3 +201,14 @@ def makeStationFilenames(start: str, end: str, ZAMGquery):
                 + f".{format_to_extention[ZAMGquery.output_format]}"
             )
     return filenames
+
+
+def getJSONfromURL(url):
+    with urllib.request.urlopen(url) as the_url:
+        try: 
+            data = json.loads(the_url.read().decode())
+            return data
+        except json.JSONDecodeError:
+            print("Failed to get JSON from URL. Maybe you need to log in? Try visiting the website:")
+            print(url)
+        

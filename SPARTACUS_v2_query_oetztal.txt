@@ -1,0 +1,10 @@
+	query
+params	RR,RRhr
+dataset	DatasetType.SPARTACUS_v2
+location_label	oetztal
+output_filename_head	spartacus-daily-v2
+output_format	netcdf
+lat_min	46.6
+lat_max	47.3
+lon_min	10.5
+lon_max	11.4
