@@ -5,6 +5,7 @@ Module containing classes, methods and functions related to queries to the ZAMG 
 import pandas as pd
 from enum import Enum
 from ZAMGdatahub import utils
+import json
 
 class DatasetType(Enum):
     INCA = "https://dataset.api.hub.zamg.ac.at/v1/grid/historical/inca-v1-1h-1km"
@@ -19,9 +20,15 @@ class DatasetType(Enum):
     STATION_10min = "https://dataset.api.hub.zamg.ac.at/v1/station/historical/klima-v1-10min"
     STATION_1h = "https://dataset.api.hub.zamg.ac.at/v1/station/historical/klima-v1-1h"
 
-    def getMetadata(self):
-        metadata = utils.getJSONfromURL(self.value+"/metadata")
-        return metadata
+    def getMetadata(self,token=None):
+        try:
+            meta_url = self.value+"/metadata"
+            metadata = utils.getJSONfromURL(meta_url)
+            return metadata
+        except json.JSONDecodeError:
+            print("Failed to get JSON from URL. Maybe you need to log in? Try visiting the website:")
+            print(meta_url)
+        
     
     
 class LatLonBox():

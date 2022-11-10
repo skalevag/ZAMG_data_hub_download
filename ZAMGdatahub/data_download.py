@@ -9,7 +9,7 @@ import time
 import datetime
 from ZAMGdatahub import utils,query
 
-def makeURL(ZAMGquery, start: str, end: str):
+def makeURL(ZAMGquery, start: str, end: str, token=None):
     """
     Makes a URL string for requesting gridded dataset from ZAMG data hub (https://data.hub.zamg.ac.at).
     
@@ -18,6 +18,8 @@ def makeURL(ZAMGquery, start: str, end: str):
     query : rasterQuery or stationQuery
     start : str
     end : str
+    token : str, optional
+        authentication token to access restricted data
     
     Returns
     -------
@@ -70,6 +72,10 @@ def makeURL(ZAMGquery, start: str, end: str):
                 url.append( baseurl + "?"+ paramurl + f"&start={sd}&end={ed}&station_ids={station}&output_format={ZAMGquery.output_format}&filename=dummy")
     else:
         raise TypeError()
+        
+    # add authentication token
+    if not token is None:
+        url = url+f"&auth={token}"
     return url
 
 
@@ -109,7 +115,7 @@ def requestData(url,outfile,overwrite=False,verbose=True, max_retries = 3):
     return str(outfile)
 
 
-def downloadData(ZAMGquery, start: str, end: str, ODIR: str, overwrite=False , verbose=True, parallelProcess=False) -> list:
+def downloadData(ZAMGquery, start: str, end: str, ODIR: str, overwrite=False , verbose=True, parallelProcess=False, token = None) -> list:
     """Requests and downloads data from ZAMG data hub, and saves the file in a specifed directory.
     For station data parallel processing is highly recommended.
     
@@ -135,15 +141,15 @@ def downloadData(ZAMGquery, start: str, end: str, ODIR: str, overwrite=False , v
             for subdir,f in filenames:
                 if not ODIR.joinpath(subdir).is_dir(): ODIR.joinpath(subdir).mkdir()
                 outfiles.append(ODIR.joinpath(subdir,f))
-            urls = makeURL(ZAMGquery,start,end)
+            urls = makeURL(ZAMGquery,start,end,token=token)
         else:
             filenames = utils.makeStationFilenames(start,end,ZAMGquery)
             outfiles = [ODIR.joinpath(f) for f in filenames]
-            urls = makeURL(ZAMGquery,start,end)
+            urls = makeURL(ZAMGquery,start,end,token=token)
     else:
         filenames = [utils.makeFilename(start,end,ZAMGquery)]
         outfiles = [ODIR.joinpath(filenames[0])]
-        urls = [makeURL(ZAMGquery,start,end)]
+        urls = [makeURL(ZAMGquery,start,end,token=token)]
     
     if parallelProcess:
         cores = min(5,mp.cpu_count()-1)

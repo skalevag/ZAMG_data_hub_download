@@ -203,12 +203,12 @@ def makeStationFilenames(start: str, end: str, ZAMGquery):
     return filenames
 
 
-def getJSONfromURL(url):
+def getJSONfromURL(url,token=None):
     with urllib.request.urlopen(url) as the_url:
-        try: 
-            data = json.loads(the_url.read().decode())
-            return data
-        except json.JSONDecodeError:
-            print("Failed to get JSON from URL. Maybe you need to log in? Try visiting the website:")
-            print(url)
+        data = json.loads(the_url.read().decode())
+    return data
         
+def getMyAuthToken(file):
+    with open(file,"r") as f:
+        token = f.read()
+    return token
